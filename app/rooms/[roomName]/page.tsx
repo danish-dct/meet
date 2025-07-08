@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { PageClientImpl } from './PageClientImpl';
+import { PageClientImpl } from '@/lib/PageClientImpl';
 import { isVideoCodec } from '@/lib/types';
+import { ConnectionProvider } from '@/lib/Context/ConnectionContext';
 
 export default async function Page({
   params,
@@ -12,6 +13,7 @@ export default async function Page({
     region?: string;
     hq?: string;
     codec?: string;
+    userEmail?: string;
   }>;
 }) {
   const _params = await params;
@@ -23,11 +25,14 @@ export default async function Page({
   const hq = _searchParams.hq === 'true' ? true : false;
 
   return (
-    <PageClientImpl
-      roomName={_params.roomName}
-      region={_searchParams.region}
-      hq={hq}
-      codec={codec}
-    />
+    <ConnectionProvider>
+      <PageClientImpl
+        roomName={_params.roomName}
+        region={_searchParams.region}
+        hq={hq}
+        codec={codec}
+        userEmail={_searchParams.userEmail}
+      />
+    </ConnectionProvider>
   );
 }

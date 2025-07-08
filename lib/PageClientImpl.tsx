@@ -10,6 +10,7 @@ import {
   VideoCodec,
 } from 'livekit-client';
 import { VideoConferenceComponent } from '@/lib/VideoConferenceComponent';
+import { useConnection } from './Context/ConnectionContext';
 
 const CONN_DETAILS_ENDPOINT =
   process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details';
@@ -19,7 +20,9 @@ export function PageClientImpl(props: {
   region?: string;
   hq: boolean;
   codec: VideoCodec;
+  userEmail?: string;
 }) {
+  const { connectionDetails, setConnectionDetails } = useConnection();
   const [preJoinChoices, setPreJoinChoices] = React.useState<LocalUserChoices | undefined>(
     undefined,
   );
@@ -30,15 +33,18 @@ export function PageClientImpl(props: {
       audioEnabled: true,
     };
   }, []);
-  const [connectionDetails, setConnectionDetails] = React.useState<ConnectionDetails | undefined>(
-    undefined,
-  );
+  // const [connectionDetails, setConnectionDetails] = React.useState<ConnectionDetails | undefined>(
+  //   undefined,
+  // );
 
   const handlePreJoinSubmit = React.useCallback(async (values: LocalUserChoices) => {
     setPreJoinChoices(values);
     const url = new URL(CONN_DETAILS_ENDPOINT, window.location.origin);
     url.searchParams.append('roomName', props.roomName);
     url.searchParams.append('participantName', values.username);
+    if (props.userEmail) {
+      url.searchParams.append('userEmail', props.userEmail);
+    }
     if (props.region) {
       url.searchParams.append('region', props.region);
     }
